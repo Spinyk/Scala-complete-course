@@ -29,20 +29,20 @@ object Competition extends App {
 
   val results = for (l <- locals;
                      k <- foreigners)
-    yield Array {
+    yield {
       val localName = l._1
       val localValue = l._2
 
       val foreignerName = k._1
       val foreignerValue = k._2
 
-      (StringBuilder.newBuilder.append(localName).append(" vs ").append(foreignerName).toString(), localValue - foreignerValue)
+      (s"$localName vs $foreignerName", localValue - foreignerValue)
     }
 
   var finalResult = 0
   for (r <- results) {
-    if (r.foldLeft(0) { (acc: Int, result: (String, Int)) => acc + result._2 } > 0) finalResult = finalResult + 1
-    else finalResult = finalResult - 1
+    if (r._2 > 0) finalResult = finalResult + 1
+    else if (r._2 < 0) finalResult = finalResult - 1
   }
 
   if (finalResult > 0) println("Наша взяла")

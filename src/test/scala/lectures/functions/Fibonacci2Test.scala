@@ -4,8 +4,11 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class Fibonacci2Test extends FlatSpec with Matchers {
 
-  "Fibonacci2 number" should "be equals to 1 for 1 and 2" in {
+  "Fibonacci2" should "return a number equals to 1 for 1" in {
     Fibonacci2.fibs2(1) should be(1)
+  }
+
+  it should "return a number equals to 1 for 2" in {
     Fibonacci2.fibs2(2) should be(1)
   }
 

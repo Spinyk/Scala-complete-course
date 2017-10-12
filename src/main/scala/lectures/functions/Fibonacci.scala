@@ -9,7 +9,7 @@ package lectures.functions
   * строчку с вычислением 1000-ого числа фибоначчи
   *
   */
-object Fibonacci extends App {
+object Fibonacci {
 
   // Task 2
   def fibs(num: Int): Int = {
@@ -17,9 +17,6 @@ object Fibonacci extends App {
     else if (num == 2) 1
     else fibs(num - 1) + fibs(num - 2)
   }
-
-  println(fibs(9))
-  //  println(fibs(1000))
 }
 
 /**
@@ -32,7 +29,7 @@ object Fibonacci extends App {
   * * * * параметр acc - аккумулятор посчитанных значений
   *
   */
-object Fibonacci2 extends App {
+object Fibonacci2 {
 
   def fibs2(num: Int) =
     if (num <= 3) Array(1, 1, 2)(num - 1)
@@ -42,7 +39,4 @@ object Fibonacci2 extends App {
     if (acc.length >= num) acc
     else fibsImpl(num, acc :+ (acc(acc.length - 1) + acc(acc.length - 2)))
   }
-
-  println(fibs2(16))
-  println(fibs2(1000))
 }

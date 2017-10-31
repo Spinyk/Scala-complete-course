@@ -13,8 +13,8 @@ package lectures.collections.comprehension
   * Во второй - количество курьеров, вышедших на работу.
   *
   * Ваша задача:
-  *  Изучить код и переписать его так,
-  *  что бы в нем не было ни одного цикла for, ни одной переменной или мутабильной коллекции
+  * Изучить код и переписать его так,
+  * что бы в нем не было ни одного цикла for, ни одной переменной или мутабильной коллекции
   *
   * Для этого используйте функции комбинаторы: filter, withFilter, fold, map, flatMap и т.д.
   *
@@ -23,10 +23,7 @@ package lectures.collections.comprehension
 case class Traffic(degree: Double)
 
 object Courier {
-  def couriers(courierCount: Int): List[Courier] =
-    (for (i <- 1 to courierCount) yield {
-      Courier(i)
-    }).toList
+  def couriers(courierCount: Int): List[Courier] = (1 to courierCount).map(Courier(_)).toList
 }
 
 case class Courier(index: Int) {
@@ -34,10 +31,7 @@ case class Courier(index: Int) {
 }
 
 object Address {
-  def addresses(addressesCount: Int): List[Address] =
-    (for (i <- 1 to addressesCount) yield {
-      Address(s"$i$i$i")
-    }).toList
+  def addresses(addressesCount: Int): List[Address] = (1 to addressesCount).map((i) => Address(s"$i$i$i")).toList
 }
 
 case class Address(postIndex: String)
@@ -54,7 +48,13 @@ object CouriersWithComprehension extends App {
   val cours = couriers(courierCount)
 
   // какие адреса были обслужены
-  def serveAddresses(addresses: List[Address], couriers: List[Courier]) = {
+  def serveAddresses(addresses: List[Address], couriers: List[Courier]) =
+    couriers.flatMap(courier => {
+      val trafficDegree = traffic().degree;
+      (0 until courier.canServe).withFilter(t => trafficDegree < 5 && t < addresses.length).map(addresses(_))
+    })
+
+  def serveAddresses1(addresses: List[Address], couriers: List[Courier]) = {
     var accum = 0
     for (courier <- couriers;
          trafficDegree = traffic().degree;
@@ -68,10 +68,7 @@ object CouriersWithComprehension extends App {
 
   def traffic(): Traffic = new Traffic(Math.random() * 10)
 
-  def printServedAddresses(addresses: List[Address], couriers: List[Courier]) =
-    for (a <- serveAddresses(addresses, couriers)) {
-      println(a.postIndex)
-    }
+  def printServedAddresses(addresses: List[Address], couriers: List[Courier]) = serveAddresses(addresses, couriers).foreach(a => println(a.postIndex))
 
   printServedAddresses(addrs, cours)
 

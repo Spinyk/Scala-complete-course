@@ -36,15 +36,28 @@ case class BSTImpl(value: Int,
                    left: Option[BSTImpl] = None,
                    right: Option[BSTImpl] = None) extends BST {
 
-  def add(newValue: Int): BST = ???
+  def add(newValue: Int): BST =
+    if (value == newValue) this
+    else if (value < newValue) BSTImpl(value, left, Option(right.getOrElse(BSTImpl(newValue, None, None)).add(newValue).asInstanceOf[BSTImpl]))
+    else BSTImpl(value, Option(left.getOrElse(BSTImpl(newValue, None, None)).add(newValue).asInstanceOf[BSTImpl]), right)
 
-  def find(value: Int): Option[BST] = ???
+  def find(value: Int): Option[BST] =
+    if (value == this.value) Option(this)
+    else if (value > this.value) this.right.get.find(value)
+    else this.left.get.find(value)
 
-  // override def toString() = ???
+  override def toString() = (s"{$value, {${left.getOrElse("Empty").toString}}, {${right.getOrElse("Empty").toString}}}")
 
 }
 
 object TreeTest extends App {
+
+  def generate(nodesCounts: Int, root: BST): BST = {
+    var tree = root
+    for (i <- 1 to nodesCounts)
+      tree = tree.add((Math.random() * maxValue).toInt)
+    tree
+  }
 
   val sc = new java.util.Scanner(System.in)
   val maxValue = 110000
@@ -56,7 +69,7 @@ object TreeTest extends App {
 
   // Generate huge tree
   val root: BST = BSTImpl(maxValue / 2)
-  val tree: BST = ??? // generator goes here
+  val tree: BST = generate(nodesCount, root)
 
   // add marker items
   val testTree = tree.add(markerItem).add(markerItem2).add(markerItem3)

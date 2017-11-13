@@ -25,16 +25,10 @@ object MyListImpl extends App {
     def map(f: (Int => Int)) =
       flatMap(inp => MyList(List(f(inp))))
 
-    def foldLeft(acc: Int)(f: ((Int, Int)) => Int): Int = {
-      var list = this.data
-      var accumulator = acc
-      while(!list.isEmpty) {
-        accumulator = f((accumulator, list.head))
-        list = list.tail
-      }
-      accumulator
+    def foldLeft(acc: Int)(f: ((Int, Int)) => Int): Int = data match {
+      case Nil => acc
+      case head :: tail => MyList(tail).foldLeft(f(acc, head))(f)
     }
-
 
     def filter(f: (Int => Boolean)) =
       flatMap(inp => {

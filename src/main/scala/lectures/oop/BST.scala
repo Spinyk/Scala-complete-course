@@ -61,7 +61,12 @@ case class BSTImpl(value: Int,
   }
 
   override def toString = {
-    def toString(node: BSTImpl) = s"${node.value} \n${node.left.map(_.value)} ${node.right.map(_.value)} \n"
+    def toString(node: BSTImpl) = node match {
+      case BSTImpl(value, Some(left), Some(right)) => s"$value \n${left.value}  ${right.value}\n"
+      case BSTImpl(value, Some(left), None) => s"$value \n${left.value} None\n"
+      case BSTImpl(value, None, Some(right)) => s"$value \nNone  ${right.value}\n"
+      case _ => ""
+    }
 
     val sb = new mutable.StringBuilder()
     this.foreach(sb ++= toString(_))

@@ -32,7 +32,7 @@ trait BST {
 
   def find(value: Int): Option[BST]
 
-  def foreach(f: BSTImpl => Unit): Unit
+  def foreach(f: BST => Unit): Unit
 }
 
 case class BSTImpl(value: Int,
@@ -49,7 +49,7 @@ case class BSTImpl(value: Int,
     else if (value > this.value) right.flatMap(_.find(value))
     else left.flatMap(_.find(value))
 
-  def foreach(f: BSTImpl => Unit): Unit = {
+  def foreach(f: BST => Unit): Unit = {
     def traverse(acc: List[BSTImpl]): Unit = acc match {
       case Nil => None
       case node :: rest =>
@@ -61,16 +61,40 @@ case class BSTImpl(value: Int,
   }
 
   override def toString = {
-    def toString(node: BSTImpl) = node match {
-      case BSTImpl(value, Some(left), Some(right)) => s"$value \n${left.value}  ${right.value}\n"
+    def toString(node: BST): String = node match {
+      case BSTImpl(value, Some(left), Some(right)) => s"$value \n${left.value} ${right.value}\n"
       case BSTImpl(value, Some(left), None) => s"$value \n${left.value} None\n"
-      case BSTImpl(value, None, Some(right)) => s"$value \nNone  ${right.value}\n"
+      case BSTImpl(value, None, Some(right)) => s"$value \nNone ${right.value}\n"
       case _ => ""
     }
 
+    def beautiful(bst: String) = {
+      def deduplicate(lines: List[String]): List[String] = for {
+        line <- lines if line.split(" ").size != 11
+      } yield line
+
+      def concat = ???
+
+      val lines = bst.split("\n").toList
+      val initialLinesAmount = lines.size
+
+      (lines.head :: deduplicate(lines.tail))
+        .foldLeft(new mutable.StringBuilder())((sb, s) => sb ++= s + "\n")
+        .toString
+    }
+
+    def format(bst: String) = {
+      val nodes = bst.split("\n").sliding(2, 2)
+      val map = mutable.Map[String, Array[String]]()
+
+      nodes.map(node => map.put(node(0), node(1).split(" ")))
+
+      ???
+    }
+
     val sb = new mutable.StringBuilder()
-    this.foreach(sb ++= toString(_))
-    sb.toString()
+    this.foreach(bst => sb ++= toString(bst))
+    sb.toString
   }
 }
 

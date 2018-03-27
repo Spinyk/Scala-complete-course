@@ -35,9 +35,20 @@ trait BST {
   def foreach(f: BST => Unit): Unit
 }
 
+object BSTImpl {
+  private val powers = {
+    val powersOf2 = (0 to 20).map(Math.pow(2, _))
+    val sums = scala.collection.mutable.ArrayBuffer(0d)
+    powersOf2.foreach(e => sums append (sums.last + e))
+    sums.toSet
+  }
+}
+
 case class BSTImpl(value: Int,
                    left: Option[BSTImpl] = None,
                    right: Option[BSTImpl] = None) extends BST {
+
+  import BSTImpl.powers
 
   def add(newValue: Int): BSTImpl =
     if (value == newValue) this
@@ -61,39 +72,12 @@ case class BSTImpl(value: Int,
   }
 
   override def toString = {
-    def toString(node: BST): String = node match {
-      case BSTImpl(value, Some(left), Some(right)) => s"$value \n${left.value} ${right.value}\n"
-      case BSTImpl(value, Some(left), None) => s"$value \n${left.value} None\n"
-      case BSTImpl(value, None, Some(right)) => s"$value \nNone ${right.value}\n"
-      case _ => ""
-    }
-
-    def beautiful(bst: String) = {
-      def deduplicate(lines: List[String]): List[String] = for {
-        line <- lines if line.split(" ").size != 11
-      } yield line
-
-      def concat = ???
-
-      val lines = bst.split("\n").toList
-      val initialLinesAmount = lines.size
-
-      (lines.head :: deduplicate(lines.tail))
-        .foldLeft(new mutable.StringBuilder())((sb, s) => sb ++= s + "\n")
-        .toString
-    }
-
-    def format(bst: String) = {
-      val nodes = bst.split("\n").sliding(2, 2)
-      val map = mutable.Map[String, Array[String]]()
-
-      nodes.map(node => map.put(node(0), node(1).split(" ")))
-
-      ???
-    }
-
     val sb = new mutable.StringBuilder()
-    this.foreach(bst => sb ++= toString(bst))
+    var counter = 0
+    this.foreach(bst => {
+      sb ++= s"${if (powers.contains(counter.toDouble)) "\n" else ""}${bst.value} "
+      counter = counter + 1
+    })
     sb.toString
   }
 }

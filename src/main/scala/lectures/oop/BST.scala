@@ -1,5 +1,6 @@
 package lectures.oop
 
+import scala.collection.mutable
 
 /**
   * BSTImpl - это бинарное дерево поиска, содержащее только значения типа Int
@@ -36,18 +37,48 @@ case class BSTImpl(value: Int,
                    left: Option[BSTImpl] = None,
                    right: Option[BSTImpl] = None) extends BST {
 
-  def add(newValue: Int): BST =
+  def add(newValue: Int): BSTImpl =
     if (value == newValue) this
-    else if (value < newValue) BSTImpl(value, left, Option(right.getOrElse(BSTImpl(newValue, None, None)).add(newValue).asInstanceOf[BSTImpl]))
-    else BSTImpl(value, Option(left.getOrElse(BSTImpl(newValue, None, None)).add(newValue).asInstanceOf[BSTImpl]), right)
+    else if (value < newValue) BSTImpl(value, left, right.map(_.add(newValue)).orElse(Some(BSTImpl(newValue, None, None))))
+    else BSTImpl(value, left.map(_.add(newValue)).orElse(Some(BSTImpl(newValue, None, None))), right)
 
-  def find(value: Int): Option[BST] =
-    if (value == this.value) Option(this)
-    else if (value > this.value) this.right.get.find(value)
-    else this.left.get.find(value)
+  def find(value: Int): Option[BSTImpl] =
+    if (value == this.value) Some(this)
+    else if (value > this.value) right.flatMap(_.find(value))
+    else left.flatMap(_.find(value))
 
-  override def toString() = (s"{$value, {${left.getOrElse("Empty").toString}}, {${right.getOrElse("Empty").toString}}}")
+  override def toString = {
+    def traverse(acc: List[BSTImpl])(sb: mutable.StringBuilder): Unit = acc match {
+      case Nil => None
+      case node :: rest => traverse(rest ++ node.left ++ node.right)(sb ++= s"${node.value} \n${node.left.map(_.value)} ${node.right.map(_.value)} \n")
+    }
 
+    val sb = new mutable.StringBuilder()
+    traverse(List(this))(sb)
+    sb.toString
+  }
+}
+
+object BSTImpl {
+
+  def traverse(bst: BSTImpl): Unit = bst match {
+    case BSTImpl(value, Some(left), Some(right)) =>
+      traverse(left)
+      traverse(right)
+    case BSTImpl(value, Some(left), None) =>
+      traverse(left)
+    case BSTImpl(value, None, Some(right)) =>
+      traverse(right)
+    case BSTImpl(value, None, None) =>
+      Unit
+  }
+
+  def currentSubtreePretty(bst: BSTImpl): String = bst match {
+    case BSTImpl(value, Some(left), Some(right)) => s"  $value\n(${left.value}  ${right.value}"
+    case BSTImpl(value, Some(left), None) => s" $value\n(${left.value} None"
+    case BSTImpl(value, None, Some(right)) => s"  $value\nNone  ${right.value}"
+    case BSTImpl(value, None, None) => s"$value"
+  }
 }
 
 object TreeTest extends App {

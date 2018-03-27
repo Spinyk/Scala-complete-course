@@ -59,28 +59,6 @@ case class BSTImpl(value: Int,
   }
 }
 
-object BSTImpl {
-
-  def traverse(bst: BSTImpl): Unit = bst match {
-    case BSTImpl(value, Some(left), Some(right)) =>
-      traverse(left)
-      traverse(right)
-    case BSTImpl(value, Some(left), None) =>
-      traverse(left)
-    case BSTImpl(value, None, Some(right)) =>
-      traverse(right)
-    case BSTImpl(value, None, None) =>
-      Unit
-  }
-
-  def currentSubtreePretty(bst: BSTImpl): String = bst match {
-    case BSTImpl(value, Some(left), Some(right)) => s"  $value\n(${left.value}  ${right.value}"
-    case BSTImpl(value, Some(left), None) => s" $value\n(${left.value} None"
-    case BSTImpl(value, None, Some(right)) => s"  $value\nNone  ${right.value}"
-    case BSTImpl(value, None, None) => s"$value"
-  }
-}
-
 object TreeTest extends App {
 
   def generate(nodesCounts: Int, root: BST): BST = {

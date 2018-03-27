@@ -31,6 +31,8 @@ trait BST {
   def add(newValue: Int): BST
 
   def find(value: Int): Option[BST]
+
+  def foreach(f: BSTImpl => Unit): Unit
 }
 
 case class BSTImpl(value: Int,
@@ -47,15 +49,23 @@ case class BSTImpl(value: Int,
     else if (value > this.value) right.flatMap(_.find(value))
     else left.flatMap(_.find(value))
 
-  override def toString = {
-    def traverse(acc: List[BSTImpl])(sb: mutable.StringBuilder): Unit = acc match {
+  def foreach(f: BSTImpl => Unit): Unit = {
+    def traverse(acc: List[BSTImpl]): Unit = acc match {
       case Nil => None
-      case node :: rest => traverse(rest ++ node.left ++ node.right)(sb ++= s"${node.value} \n${node.left.map(_.value)} ${node.right.map(_.value)} \n")
+      case node :: rest =>
+        f(node)
+        traverse(rest ++ node.left ++ node.right)
     }
 
+    traverse(List(this))
+  }
+
+  override def toString = {
+    def toString(node: BSTImpl) = s"${node.value} \n${node.left.map(_.value)} ${node.right.map(_.value)} \n"
+
     val sb = new mutable.StringBuilder()
-    traverse(List(this))(sb)
-    sb.toString
+    this.foreach(sb ++= toString(_))
+    sb.toString()
   }
 }
 

@@ -83,7 +83,17 @@ case class BSTImpl(value: Int,
       sb ++= s"${if (powers.contains(counter.toDouble)) "\n" else ""}${stringView(bstOpt)} "
       counter = counter + 1
     })
-    sb.toString
+
+    val lines = sb.toString.split("\n")
+    val tabs = (0 until lines.size)
+      .reverse
+      .map("\t" * _)
+
+    lines
+      .zip(tabs)
+      .map{ case (line, tab) => s"$tab$line\n" }
+      .foldLeft(new mutable.StringBuilder())(_ ++= _)
+      .toString
   }
 }
 

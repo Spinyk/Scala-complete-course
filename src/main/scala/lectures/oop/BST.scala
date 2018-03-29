@@ -32,7 +32,7 @@ trait BST {
 
   def find(value: Int): Option[BST]
 
-  def foreach(f: BST => Unit): Unit
+  def foreach(f: Option[BST] => Unit): Unit
 }
 
 object BSTImpl {
@@ -60,22 +60,27 @@ case class BSTImpl(value: Int,
     else if (value > this.value) right.flatMap(_.find(value))
     else left.flatMap(_.find(value))
 
-  def foreach(f: BST => Unit): Unit = {
-    def traverse(acc: List[BSTImpl]): Unit = acc match {
+  def foreach(f: Option[BST] => Unit): Unit = {
+    def traverse(acc: List[Option[BSTImpl]]): Unit = acc match {
       case Nil => None
       case node :: rest =>
         f(node)
-        traverse(rest ++ node.left ++ node.right)
+        traverse(rest ++ node.map(_.left).orElse(None) ++ node.map(_.right).orElse(None))
     }
 
-    traverse(List(this))
+    traverse(List(Some(this)))
   }
 
   override def toString = {
+    def stringView(bstOpt: Option[BST]) = bstOpt match {
+      case Some(bst) => s"${bst.value} "
+      case None => "None "
+    }
+
     val sb = new mutable.StringBuilder()
     var counter = 0
-    this.foreach(bst => {
-      sb ++= s"${if (powers.contains(counter.toDouble)) "\n" else ""}${bst.value} "
+    this.foreach(bstOpt => {
+      sb ++= s"${if (powers.contains(counter.toDouble)) "\n" else ""}${stringView(bstOpt)} "
       counter = counter + 1
     })
     sb.toString

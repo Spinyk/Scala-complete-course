@@ -35,20 +35,9 @@ trait BST {
   def foreach(f: Option[BST] => Unit): Unit
 }
 
-object BSTImpl {
-  private val powers = {
-    val powersOf2 = (0 to 20).map(Math.pow(2, _))
-    val sums = scala.collection.mutable.ArrayBuffer(0d)
-    powersOf2.foreach(e => sums append (sums.last + e))
-    sums.toSet
-  }
-}
-
 case class BSTImpl(value: Int,
                    left: Option[BSTImpl] = None,
                    right: Option[BSTImpl] = None) extends BST {
-
-  import BSTImpl.powers
 
   def add(newValue: Int): BSTImpl =
     if (value == newValue) this
@@ -72,28 +61,36 @@ case class BSTImpl(value: Int,
   }
 
   override def toString = {
-    def stringView(bstOpt: Option[BST]) = bstOpt match {
-      case Some(bst) => s"${bst.value} "
-      case None => "None "
+    def toLineView(bst: BSTImpl) = {
+      val sb = new mutable.StringBuilder()
+      bst.foreach(_ match {
+        case Some(bst) => sb ++= s"${bst.value} "
+        case None => sb ++= "None "
+      })
+      sb.toString()
     }
 
-    val sb = new mutable.StringBuilder()
-    var counter = 0
-    this.foreach(bstOpt => {
-      sb ++= s"${if (powers.contains(counter.toDouble)) "\n" else ""}${stringView(bstOpt)} "
-      counter = counter + 1
-    })
+    def toStairView(line: String) = {
+      def traverse(acc: List[String], ys: List[String], power: Int): List[String] = acc match {
+        case Nil => ys
+        case acc => traverse(
+            acc = acc.drop(Math.pow(2, power).toInt),
+            ys = ys :+ acc.take(Math.pow(2, power).toInt).foldLeft(new mutable.StringBuilder())((sb, s) => sb ++= s"$s ").toString,
+            power = power + 1)
+      }
 
-    val lines = sb.toString.split("\n")
-    val tabs = (0 until lines.size)
-      .reverse
-      .map("\t" * _)
+      traverse(line.split(" ").toList, List(), 0)
+    }
 
-    lines
-      .zip(tabs)
-      .map{ case (line, tab) => s"$tab$line\n" }
-      .foldLeft(new mutable.StringBuilder())(_ ++= _)
-      .toString
+    def toTreeView(stair: Seq[String]) = {
+      stair
+        .zip((0 until stair.size).map("\t" * _).reverse)
+        .map { case (line, tab) => s"$tab$line\n" }
+        .foldLeft(new mutable.StringBuilder())(_ ++= _)
+        .toString
+    }
+
+    (toLineView _ andThen toStairView andThen toTreeView) (this)
   }
 }
 

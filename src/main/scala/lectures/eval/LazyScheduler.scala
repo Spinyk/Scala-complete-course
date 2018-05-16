@@ -2,7 +2,7 @@ package lectures.eval
 
 import java.time.Clock
 
-import scala.collection.SeqView
+import scala.collection.{SeqView, SeqViewLike}
 
 /**
   * В этом задании ваша задча реализовать своеобразный View с таймером.
@@ -27,7 +27,15 @@ object LazySchedulerView {
       */
     def lazySchedule(expirationTimeout: Long): SeqView[A, Seq[_]]  = {
       val i = c.instant().plusMillis(expirationTimeout)
-      ???
+      new SeqView[A, Seq[_]] {
+        override def iterator = if (c.instant().isBefore(i)) f.view.iterator else Seq.empty.view.iterator
+
+        override protected def underlying = if (c.instant().isBefore(i)) f else Seq.empty
+
+        override def length = if (c.instant().isBefore(i)) f.view.length else Seq.empty.view.length
+
+        override def apply(idx: Int) = if (c.instant().isBefore(i)) f.view.apply(idx) else Seq.empty.view.apply(idx)
+      }
     }
   }
 }

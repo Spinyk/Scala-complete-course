@@ -3,13 +3,12 @@ package lectures.oop.notfatugly
 import java.security.MessageDigest
 
 import lectures.oop.notfatugly.Domain.{DbConnection, HttpRequest, HttpResponse, MqConnection}
-import lectures.oop.notfatugly.database.{Database, FilesRepositoryImpl}
+import lectures.oop.notfatugly.database.{Database, FilesRepository, FilesRepositoryImpl}
 import lectures.oop.notfatugly.mailing.AsyncMailClient
-import lectures.oop.notfatugly.mq.{FilesIbmMqSink, IbmMq}
+import lectures.oop.notfatugly.mq.{FilesIbmMqSink, IbmMq, IbmMqSink}
 import lectures.oop.notfatugly.uploadfiles.{UploadFilesHandler, UploadFilesService}
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 
 /**
@@ -31,10 +30,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   *
   * Удачи!
   */
-class NotFatUglyController {
-  private val mailer = new AsyncMailClient()
-  private val ibmMq = new FilesIbmMqSink()
-  private val repository = new FilesRepositoryImpl()
+class NotFatUglyController(mailer: AsyncMailClient, ibmMq: FilesIbmMqSink, repository: FilesRepository) {
   private val uploadFilesService = new UploadFilesService(repository, ibmMq, mailer)(MqConnection(IbmMq.connectToIbmMq()) ,DbConnection(Database.connectToPostgresDatabase()))
   private val uploadFilesHandler = new UploadFilesHandler(uploadFilesService)
 
